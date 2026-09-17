@@ -1,0 +1,157 @@
+{
+  "entities": {
+    "user": {
+      "title": "UserProfile",
+      "description": "Registered Voltiva customer or administrator profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Firebase Auth UID" },
+        "fullName": { "type": "string", "maxLength": 100 },
+        "email": { "type": "string", "format": "email", "maxLength": 120 },
+        "phoneNumber": { "type": "string", "maxLength": 20 },
+        "role": { "type": "string", "enum": ["user", "admin", "agent"] },
+        "isVerified": { "type": "boolean" },
+        "transactionPinSet": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "fullName", "email", "role"]
+    },
+    "wallet": {
+      "title": "Wallet",
+      "description": "User NGN stored-value wallet and virtual account details",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "availableBalance": { "type": "number" },
+        "pendingBalance": { "type": "number" },
+        "currency": { "type": "string", "enum": ["NGN"] },
+        "virtualAccountNumber": { "type": "string", "maxLength": 15 },
+        "virtualBankName": { "type": "string", "maxLength": 60 },
+        "accountName": { "type": "string", "maxLength": 100 },
+        "dailyTransactionLimit": { "type": "number" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "availableBalance", "currency"]
+    },
+    "transaction": {
+      "title": "Transaction",
+      "description": "VTU airtime, data, electricity, cable recharge or wallet funding transaction",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "reference": { "type": "string", "maxLength": 60 },
+        "userId": { "type": "string" },
+        "userName": { "type": "string", "maxLength": 100 },
+        "serviceType": { "type": "string", "enum": ["airtime", "data", "electricity", "cable", "wallet_funding"] },
+        "provider": { "type": "string", "maxLength": 40 },
+        "recipient": { "type": "string", "maxLength": 60 },
+        "amount": { "type": "number" },
+        "fee": { "type": "number" },
+        "discount": { "type": "number" },
+        "totalPaid": { "type": "number" },
+        "status": { "type": "string", "enum": ["successful", "pending", "failed", "reversed"] },
+        "paymentMethod": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" },
+        "description": { "type": "string", "maxLength": 200 },
+        "providerReference": { "type": "string", "maxLength": 100 },
+        "token": { "type": "string", "maxLength": 50 },
+        "units": { "type": "string", "maxLength": 30 }
+      },
+      "required": ["id", "reference", "userId", "serviceType", "amount", "totalPaid", "status"]
+    },
+    "beneficiary": {
+      "title": "Beneficiary",
+      "description": "Saved frequent recipient for top-ups and bill payments",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string", "maxLength": 80 },
+        "type": { "type": "string", "enum": ["phone", "meter", "smartcard"] },
+        "provider": { "type": "string", "maxLength": 40 },
+        "accountIdentifier": { "type": "string", "maxLength": 40 },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "name", "type", "provider", "accountIdentifier"]
+    },
+    "notification": {
+      "title": "NotificationItem",
+      "description": "System event or promotional alert for user",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string", "maxLength": 120 },
+        "message": { "type": "string", "maxLength": 300 },
+        "category": { "type": "string", "enum": ["wallet", "transaction", "promo", "security"] },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "userId", "title", "message", "isRead"]
+    },
+    "support_ticket": {
+      "title": "SupportTicket",
+      "description": "Customer inquiry or resolution dispute ticket",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "ticketNumber": { "type": "string", "maxLength": 30 },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string", "format": "email" },
+        "userName": { "type": "string", "maxLength": 100 },
+        "subject": { "type": "string", "maxLength": 150 },
+        "category": { "type": "string" },
+        "priority": { "type": "string", "enum": ["low", "medium", "high", "urgent"] },
+        "status": { "type": "string", "enum": ["open", "investigating", "resolved", "closed"] },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "ticketNumber", "userId", "subject", "status"]
+    },
+    "admin": {
+      "title": "Admin",
+      "description": "Authorized staff/super-administrator access entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "role": { "type": "string", "enum": ["admin"] },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["id", "email", "role"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "user",
+      "description": "Customer and administrator user profiles"
+    },
+    "/wallets/{walletId}": {
+      "schema": "wallet",
+      "description": "Customer account balance and virtual account records"
+    },
+    "/transactions/{txId}": {
+      "schema": "transaction",
+      "description": "Full transactions ledger for VTU charges and fund deposits"
+    },
+    "/beneficiaries/{benId}": {
+      "schema": "beneficiary",
+      "description": "Saved recipient address book"
+    },
+    "/notifications/{notifId}": {
+      "schema": "notification",
+      "description": "User specific in-app notifications and alerts"
+    },
+    "/support_tickets/{ticketId}": {
+      "schema": "support_ticket",
+      "description": "Customer support correspondence and inquiries"
+    },
+    "/admins/{adminId}": {
+      "schema": "admin",
+      "description": "Privileged administrator role mapping for access control"
+    }
+  }
+}

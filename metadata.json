@@ -1,0 +1,6 @@
+{
+  "name": "Voltiva - VTU & Everyday Payments",
+  "description": "Everyday payments, made effortless. Modern fintech platform for airtime, data, electricity, and cable TV top-ups in Nigeria.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
