@@ -2,14 +2,44 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ─── Voltiva Design Tokens ──────────────────────────────────────────────── */
+/* Derived from product specifics: Nigerian VTU fintech, transactional speed, */
+/* electric signal + prepaid power as the two core metaphors.                 */
+
 @layer base {
   :root {
+    /* Type */
     --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-display: 'Space Grotesk', system-ui, sans-serif;
+
+    /* Color tokens — light mode */
+    --volt-ink:     #0d1117;      /* Near-black, blue-shifted — reads as precision, not warmth */
+    --volt-surface: #f0f4f8;      /* Off-white surface, cooler than cream */
+    --volt-panel:   #ffffff;      /* Pure white panel — cards, modals */
+    --volt-line:    #dde3ea;      /* Border — present but quiet */
+    --volt-muted:   #64748b;      /* Secondary text, labels */
+    --volt-charge:  #16c784;      /* Signal green — confirmed, live, fast money moving */
+    --volt-amber:   #f59e0b;      /* Electricity only — power, the Disco grid */
+    --volt-text:    #0d1117;      /* Primary text */
+    --volt-subtext: #475569;      /* Body copy, descriptions */
   }
-  
+
+  .dark {
+    /* Color tokens — dark mode */
+    --volt-ink:     #0d1117;
+    --volt-surface: #111827;      /* Mid-dark — one stop above ink, creates depth */
+    --volt-panel:   #1a2234;      /* Card surface — not pure black, has warmth */
+    --volt-line:    #1e2d3d;      /* Border in dark — structural without decorating */
+    --volt-muted:   #475569;
+    --volt-charge:  #16c784;
+    --volt-amber:   #f59e0b;
+    --volt-text:    #f1f5f9;
+    --volt-subtext: #94a3b8;
+  }
+
   html {
     color-scheme: dark;
+    font-size: 15px;              /* Base = 15px. Tailwind rem units scale from this */
   }
 
   html.light {
@@ -19,40 +49,65 @@
   body {
     font-family: var(--font-sans);
     overflow-x: hidden;
+    background-color: var(--volt-surface);
+    color: var(--volt-text);
     transition: background-color 0.2s ease, color 0.2s ease;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  /* Visible keyboard focus — accessible quality floor */
+  :focus-visible {
+    outline: 2px solid var(--volt-charge);
+    outline-offset: 3px;
+    border-radius: 4px;
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(148, 163, 184, 0.25);
-    border-radius: 9999px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: rgba(148, 163, 184, 0.45);
+
+  /* Respect motion preferences — one rule, all animations off */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
+
+/* ─── Utility classes ────────────────────────────────────────────────────── */
 
 .font-display {
   font-family: var(--font-display);
 }
 
-/* Ensure no element accidentally causes unwanted overflow */
-* {
-  box-sizing: border-box;
+/* Charge color utilities */
+.text-charge   { color: var(--volt-charge); }
+.bg-charge     { background-color: var(--volt-charge); }
+.border-charge { border-color: var(--volt-charge); }
+
+/* Scrollbar — minimal, not invisible */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--volt-line);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--volt-muted);
 }
 
-/* Subtle print styles for receipts */
+/* ─── Print styles for receipts ──────────────────────────────────────────── */
 @media print {
   body {
     background-color: #ffffff !important;
     color: #0f172a !important;
+    font-size: 12px;
   }
   .no-print {
     display: none !important;
@@ -60,4 +115,11 @@
   .print-only {
     display: block !important;
   }
+}
+
+/* ─── Global box-sizing ──────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
