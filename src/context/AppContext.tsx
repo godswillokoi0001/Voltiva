@@ -305,7 +305,7 @@ const SEED_TICKETS: SupportTicket[] = [
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     const saved = localStorage.getItem('voltiva_user');
-    return saved ? JSON.parse(saved) : SEED_CUSTOMER_USER;
+    return saved ? JSON.parse(saved) : null;
   });
 
   const [wallet, setWallet] = useState<Wallet | null>(() => {
@@ -333,7 +333,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : SEED_TICKETS;
   });
 
-  const [activeView, setActiveView] = useState<string>('dashboard');
+  const [activeView, setActiveView] = useState<string>('landing');
   const [selectedReceiptTx, setSelectedReceiptTx] = useState<Transaction | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [authError, setAuthError] = useState<string | null>(null);
@@ -570,6 +570,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setAuthError(null);
     try {
       await signInWithPopup(auth, googleProvider);
+      setActiveView('dashboard');
       setIsLoading(false);
       return true;
     } catch (err: unknown) {
@@ -624,6 +625,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (password) {
         try {
           await signInWithEmailAndPassword(auth, email, password);
+          setActiveView('dashboard');
           setIsLoading(false);
           return true;
         } catch {
@@ -648,6 +650,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         });
       }
 
+      setActiveView('dashboard');
       setIsLoading(false);
       return true;
     } catch (err: unknown) {
@@ -674,6 +677,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       dailyTransactionLimit: 5000000.00,
       updatedAt: new Date().toISOString(),
     });
+    setActiveView('dashboard');
     setIsLoading(false);
     return true;
   };
@@ -684,6 +688,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setUser(SEED_CUSTOMER_USER);
     setWallet(SEED_WALLET);
     setTransactions(SEED_TRANSACTIONS);
+    setActiveView('dashboard');
     setIsLoading(false);
     return true;
   };
@@ -695,6 +700,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (password) {
         try {
           await createUserWithEmailAndPassword(auth, email, password);
+          setActiveView('dashboard');
           setIsLoading(false);
           return true;
         } catch {
@@ -743,6 +749,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
       setNotifications(prev => [welcomeNotif, ...prev]);
 
+      setActiveView('dashboard');
       setIsLoading(false);
       return true;
     } catch (err: unknown) {
@@ -760,6 +767,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
     cleanupFirestoreListeners();
     setUser(null);
+    localStorage.removeItem('voltiva_user');
     setActiveView('landing');
   };
 
