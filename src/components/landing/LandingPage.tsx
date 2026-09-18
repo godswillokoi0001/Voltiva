@@ -1,24 +1,20 @@
 import React, { useState } from 'react';
-import {
-  Smartphone,
-  Wifi,
-  Zap,
-  Tv,
-  ShieldCheck,
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-  HelpCircle,
-  ChevronDown,
-  ChevronUp,
-  Lock,
-  ArrowDownLeft,
-  Receipt,
-  FileCheck2,
-  Copy,
+import { 
+  Smartphone, 
+  Wifi, 
+  Zap, 
+  Tv, 
+  ShieldCheck, 
+  ArrowRight, 
+  CheckCircle2, 
+  Sparkles,
   Check,
+  Copy,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatNaira } from '../../utils/formatters';
 import { ThemeToggle } from '../common/ThemeToggle';
 
 interface LandingPageProps {
@@ -28,526 +24,758 @@ interface LandingPageProps {
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreService }) => {
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [copied, setCopied] = useState(false);
+  const [copiedToken, setCopiedToken] = useState(false);
+  const [copiedAccount, setCopiedAccount] = useState(false);
+  
+  // Interactive Hero Demo State
+  const [demoService, setDemoService] = useState<'airtime' | 'electricity' | 'data' | 'cable'>('airtime');
+  const [demoAmount, setDemoAmount] = useState<number>(2000);
+  const [demoNetwork, setDemoNetwork] = useState<string>('MTN');
+
+  const demoCashback = Math.round(demoAmount * 0.02);
+  const demoTotalToPay = demoAmount - demoCashback;
 
   const faqs = [
     {
       q: 'How do I fund my Voltiva wallet?',
-      a: 'Transfer to your dedicated Wema Bank virtual account from any Nigerian banking app — GTBank, Access, Zenith, Kuda, OPay, and others. Balance is credited in seconds. You can also use debit card checkout via Paystack.'
+      a: 'Instantly. Once registered, you receive a dedicated Wema Bank virtual account number. Any bank transfer sent from GTBank, Access, Zenith, Kuda, OPay, Moniepoint, or any banking app reflects in your Voltiva balance within 3 seconds with zero manual approval.'
     },
     {
-      q: 'How fast are airtime, data, and electricity token deliveries?',
-      a: 'Telco airtime and data bundles are credited within 3–5 seconds of payment. Prepaid electricity STS tokens (20-digit) are generated immediately on screen and sent via SMS — before you close the confirmation page.'
+      q: 'How fast are airtime, data, and electricity tokens delivered?',
+      a: 'Every transaction is automated via direct Telco and NERC Disco API rails. Airtime and data bundles reflect on your SIM card within 3 to 5 seconds. Prepaid 20-digit STS electricity tokens appear instantly on-screen and arrive via SMS before you leave the page.'
     },
     {
-      q: 'What happens if a transaction fails or my meter does not credit?',
-      a: 'If the upstream Telco or Disco provider times out, our reconciliation engine attempts a secondary verification. If still unfulfilled, your wallet balance is reversed immediately. You can raise a dispute ticket and get 24/7 priority resolution.'
+      q: 'What happens if a network or Disco provider experiences downtime?',
+      a: 'Our smart reconciliation engine tests provider latency in real-time. If an upstream Telco or Disco times out, your funds are reversed back to your Voltiva wallet automatically with zero ghosting, and you can generate an instant priority support ticket.'
     },
     {
-      q: 'Can I top up for someone else?',
-      a: 'Yes. Enter any third-party phone number, meter number, or DStv/GOtv smartcard. Save frequent recipients to your Beneficiaries list for 1-click repeat recharges.'
+      q: 'Can I pay utility bills and buy airtime for others?',
+      a: 'Yes. You can recharge any family member, friend, tenant, or client. Save their phone numbers, meter IDs, or smartcards in your Beneficiaries list to complete future recurring top-ups in just one click.'
     },
     {
-      q: 'Are there any hidden fees?',
-      a: 'None. Airtime and data are free — airtime gets you an additional 2% cashback. Electricity payments carry a regulated NERC utility charge of ₦100. Cable TV renewals have a ₦50 gateway fee. That is the complete list.'
+      q: 'Are there any hidden subscription charges or wallet fees?',
+      a: 'Absolutely none. Wallet creation and holding funds are 100% free. Airtime and data top-ups have zero fees plus an instant 2% cashback. Electricity payments carry a standard statutory NERC charge of ₦100, and TV bouquet renewals have a ₦50 processing charge.'
     },
     {
-      q: 'Is my payment data secure?',
-      a: 'Voltiva enforces 256-bit TLS bank-grade encryption, a 4-digit Transaction PIN for all debits, and Firestore role-based security rules. No card credentials are stored on our servers.'
+      q: 'Is my personal and financial information secure?',
+      a: 'Voltiva complies with strict security standards using 256-bit TLS bank-grade encryption, role-based Firestore security rules, and mandatory 4-digit Transaction PIN authorization for debits. Debit card processing is handled directly by licensed PCI-DSS processors (Paystack).'
     }
   ];
 
-  // Single orchestrated entrance: hero text stagger only
-  const heroVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.05,
-      }
-    }
-  };
-  const heroChild = {
-    hidden: { opacity: 0, y: 18 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } }
-  };
-  const heroMockup = {
-    hidden: { opacity: 0, y: 28 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] } }
+  const handleCopyAccount = () => {
+    navigator.clipboard.writeText('9018472910');
+    setCopiedAccount(true);
+    setTimeout(() => setCopiedAccount(false), 2000);
   };
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText('9018472910');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopyToken = () => {
+    navigator.clipboard.writeText('4892-0194-8261-9034');
+    setCopiedToken(true);
+    setTimeout(() => setCopiedToken(false), 2000);
   };
 
   return (
-    <div className="min-h-screen bg-[--volt-surface] text-[--volt-text] transition-colors duration-200 overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#070a12] text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden w-full max-w-full selection:bg-emerald-500/20 selection:text-emerald-500">
+      
+      {/* ── Dynamic Atmospheric Mesh Background ─────────────────────────── */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-500/10 dark:bg-emerald-500/15 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -right-40 w-96 h-96 bg-teal-500/10 dark:bg-cyan-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 left-1/3 w-80 h-80 bg-emerald-600/5 dark:bg-emerald-500/8 rounded-full blur-3xl" />
+      </div>
 
       {/* ── Navigation ──────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[--volt-panel]/90 dark:bg-[#0d1117]/90 backdrop-blur-md border-b border-[--volt-line] transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-[70px] flex items-center justify-between">
-
-          {/* Logo — the V mark is the brand's only distinct visual element; no decorative tagline pill */}
+      <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#070a12]/80 backdrop-blur-md border-b border-slate-200/70 dark:border-white/5 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+          
+          {/* Brand Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[--volt-charge] flex items-center justify-center font-display font-black text-[#0d1117] text-lg leading-none select-none">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center font-display font-black text-slate-950 text-xl shadow-lg shadow-emerald-500/25 select-none">
               V
             </div>
-            <span className="font-display text-xl font-bold tracking-tight text-[--volt-text]">Voltiva</span>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-display text-2xl font-black tracking-tight text-slate-900 dark:text-white">Voltiva</span>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] uppercase font-bold tracking-wider text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 dark:bg-emerald-500/15 px-2 py-0.5 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Live VTU
+                </span>
+              </div>
+            </div>
           </div>
 
-          <nav className="hidden md:flex items-center gap-8 text-[13px] font-semibold text-[--volt-muted]">
-            <a href="#services" className="hover:text-[--volt-text] transition-colors">Services</a>
-            <a href="#how-it-works" className="hover:text-[--volt-text] transition-colors">How it works</a>
-            <a href="#pricing" className="hover:text-[--volt-text] transition-colors">Fees</a>
-            <a href="#faq" className="hover:text-[--volt-text] transition-colors">FAQ</a>
+          {/* Nav Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600 dark:text-slate-300">
+            <a href="#services" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Services</a>
+            <a href="#how-it-works" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">How It Works</a>
+            <a href="#preview" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Live Demo</a>
+            <a href="#pricing" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Pricing & Fees</a>
+            <a href="#faq" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">FAQ</a>
           </nav>
 
-          <div className="flex items-center gap-2">
+          {/* Auth & Theme Controls */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <ThemeToggle />
             <button
               id="nav-login-btn"
               onClick={() => onOpenAuth('login')}
-              className="px-4 py-2 rounded-md text-[13px] font-semibold text-[--volt-text] hover:bg-[--volt-line] transition-colors cursor-pointer"
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
             >
-              Log in
+              Log In
             </button>
             <button
               id="nav-signup-btn"
               onClick={() => onOpenAuth('signup')}
-              className="px-4 py-2.5 rounded-md bg-[--volt-charge] text-[#0d1117] text-[13px] font-bold transition-all cursor-pointer hover:opacity-90"
+              className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-xs font-extrabold tracking-wide transition-all shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] cursor-pointer"
             >
-              Create account
+              Create Account
             </button>
           </div>
         </div>
       </header>
 
-      {/* ── Hero ────────────────────────────────────────────────────────── */}
-      <section className="relative pt-16 pb-12 md:pt-24 md:pb-16 border-b border-[--volt-line]">
+      {/* ── HERO SECTION ────────────────────────────────────────────────── */}
+      <section className="relative pt-12 pb-20 md:pt-20 md:pb-28 overflow-hidden z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            
+            {/* Left Column: Core Value Proposition */}
+            <div className="lg:col-span-6 space-y-7 text-center lg:text-left">
+              
+              {/* Live Status Pill */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/80 backdrop-blur-md border border-emerald-500/20 shadow-sm text-emerald-700 dark:text-emerald-400 text-xs font-bold">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Next-Gen Nigerian VTU · Instant 2% Cashback</span>
+              </div>
 
-            {/* Left: Copy — left-aligned, financial and direct */}
-            <motion.div
-              variants={heroVariants}
-              initial="hidden"
-              animate="visible"
-              className="space-y-7"
-            >
-              <motion.h1
-                variants={heroChild}
-                className="font-display font-black text-[2.75rem] sm:text-[3.5rem] leading-[1.05] tracking-tight text-[--volt-text] max-w-[18ch]"
-              >
-                Every Nigerian utility payment. One place.
-              </motion.h1>
+              {/* Dynamic Headline */}
+              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white tracking-tight leading-[1.08]">
+                Everyday payments.<br />
+                <span className="bg-gradient-to-r from-emerald-500 via-teal-400 to-cyan-400 bg-clip-text text-transparent">
+                  Fulfilled at electric speed.
+                </span>
+              </h1>
 
-              <motion.p
-                variants={heroChild}
-                className="text-[1rem] text-[--volt-subtext] leading-[1.7] max-w-[55ch]"
-              >
-                Fund your wallet once. Recharge airtime with instant cashback, buy high-speed data bundles, generate prepaid electricity tokens, and renew cable subscriptions — all from a single dashboard.
-              </motion.p>
+              <p className="text-base sm:text-lg text-slate-600 dark:text-slate-300 font-normal leading-relaxed max-w-xl mx-auto lg:mx-0">
+                Fund your wallet once via dedicated Wema virtual bank inward. Recharge airtime with instant 2% cashback, buy high-speed SME data, generate prepaid electricity tokens, and renew cable TV in 3 seconds.
+              </p>
 
-              <motion.div variants={heroChild} className="flex flex-col sm:flex-row gap-3">
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-1">
                 <button
                   id="hero-get-started-btn"
                   onClick={() => onOpenAuth('signup')}
-                  className="px-7 py-3.5 rounded-md bg-[--volt-charge] text-[#0d1117] font-bold text-[0.9375rem] transition-all cursor-pointer hover:opacity-90 inline-flex items-center gap-2 w-full sm:w-auto justify-center"
+                  className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-extrabold text-sm flex items-center justify-center gap-2.5 transition-all shadow-xl shadow-emerald-500/25 hover:shadow-emerald-500/40 hover:scale-[1.02] cursor-pointer"
                 >
-                  Open free account
+                  <span>Open Free Account</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
+
                 <a
                   href="#preview"
-                  className="px-7 py-3.5 rounded-md bg-transparent text-[--volt-text] border border-[--volt-line] font-semibold text-[0.9375rem] flex items-center gap-2 hover:border-[--volt-charge]/40 transition-colors w-full sm:w-auto justify-center"
+                  className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200/80 dark:border-white/10 font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-sm hover:border-emerald-500/30"
                 >
-                  See the dashboard
+                  <span>Test Live Calculator</span>
                 </a>
-              </motion.div>
+              </div>
 
-              {/* Trust line — plain text, no icons, no cards */}
-              <motion.p variants={heroChild} className="text-[0.8125rem] text-[--volt-muted] leading-relaxed">
-                Free to sign up · 2% cashback on airtime · Wema Bank virtual account · 256-bit TLS encryption
-              </motion.p>
-            </motion.div>
+              {/* Trust Micro-Metrics */}
+              <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-y-2 gap-x-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Free Virtual Bank Inward</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>3-Second Dispensation</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                  <span>Zero Failed Reversals</span>
+                </div>
+              </div>
+            </div>
 
-            {/* Right: Product mockup — the real UI, not a phone frame */}
-            <motion.div
-              id="preview"
-              variants={heroMockup}
-              initial="hidden"
-              animate="visible"
-              className="w-full"
-            >
-              <div className="rounded-xl bg-[--volt-panel] dark:bg-[#111827] border border-[--volt-line] overflow-hidden shadow-2xl">
-                {/* Mock browser chrome */}
-                <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[--volt-line] bg-[--volt-surface] dark:bg-[#0d1117]">
-                  <div className="w-2.5 h-2.5 rounded-full bg-rose-500/70"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/70"></div>
-                  <div className="w-2.5 h-2.5 rounded-full bg-[--volt-charge]/70"></div>
-                  <span className="ml-3 font-display text-[11px] text-[--volt-muted] hidden sm:inline">voltiva.app/dashboard</span>
-                  <div className="ml-auto flex items-center gap-1.5 text-[--volt-charge]">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[--volt-charge] animate-pulse"></span>
-                    <span className="text-[11px] font-semibold text-[--volt-muted]">99.99% uptime</span>
+            {/* Right Column: Rich Interactive Live Terminal Mockup */}
+            <div id="preview" className="lg:col-span-6 w-full">
+              <div className="relative rounded-3xl bg-white/95 dark:bg-[#0e1626]/95 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-2xl p-5 sm:p-7 glow-card">
+                
+                {/* Window Header */}
+                <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5">
+                  <div className="flex items-center gap-2">
+                    <span className="w-3 h-3 rounded-full bg-rose-500/80" />
+                    <span className="w-3 h-3 rounded-full bg-amber-500/80" />
+                    <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                    <span className="ml-2 font-mono text-[11px] text-slate-400 hidden sm:inline">voltiva.app/terminal</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-mono text-xs font-semibold">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>99.99% Gateway Rails Live</span>
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-5 space-y-4">
-                  {/* Balance card — the number is the hero */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                    <div className="md:col-span-2 bg-[#0d1117] rounded-lg p-5 flex flex-col justify-between min-h-[130px]">
-                      <div>
-                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">Available balance</span>
-                        <div className="font-display text-[2rem] sm:text-[2.5rem] font-black text-white mt-1.5 leading-none">₦48,500.00</div>
+                {/* Interactive Demo Content */}
+                <div className="space-y-5 pt-4">
+                  
+                  {/* Balance & Virtual Bank Ribbon */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-2 rounded-2xl bg-gradient-to-br from-slate-900 via-[#0d1728] to-emerald-950 p-4 text-white shadow-md relative overflow-hidden">
+                      <div className="absolute right-0 top-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-xl pointer-events-none" />
+                      <div className="relative flex justify-between items-start">
+                        <div>
+                          <span className="text-[11px] font-semibold text-emerald-400/90 uppercase tracking-wider">Available Balance</span>
+                          <div className="font-display text-3xl font-black text-white mt-1">₦48,500.00</div>
+                        </div>
+                        <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-500/30">
+                          Tier 2 KYC
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 pt-4 border-t border-white/10 mt-4">
-                        <span className="px-3 py-1.5 rounded bg-[--volt-charge] text-[#0d1117] font-bold text-[12px]">Fund wallet</span>
-                        <span className="px-3 py-1.5 rounded bg-white/10 text-slate-300 font-semibold text-[12px]">History</span>
+                      <div className="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-xs">
+                        <span className="text-slate-400">Cashback Saved This Month:</span>
+                        <span className="font-mono font-bold text-emerald-400">+₦3,420.00</span>
                       </div>
                     </div>
-                    <div className="bg-[--volt-surface] dark:bg-[#0d1117]/60 rounded-lg p-4 border border-[--volt-line] space-y-2">
-                      <span className="text-[11px] font-semibold text-[--volt-charge] uppercase tracking-wide">Wema Bank (Voltiva)</span>
+
+                    {/* Dedicated Virtual Account */}
+                    <div className="rounded-2xl bg-slate-100 dark:bg-slate-900/90 p-4 border border-slate-200/80 dark:border-white/5 space-y-1.5 flex flex-col justify-between">
                       <div>
-                        <p className="font-display text-[1.1rem] font-bold text-[--volt-text] tracking-widest">9018472910</p>
-                        <p className="text-[11px] text-[--volt-muted] mt-0.5">Auto-credited in seconds</p>
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">Wema Virtual Bank</span>
+                        <p className="font-mono text-base font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">9018472910</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-400">Instant Inward Credit</p>
                       </div>
                       <button
-                        onClick={handleCopy}
-                        className="flex items-center gap-1.5 text-[11px] font-semibold text-[--volt-muted] hover:text-[--volt-text] transition-colors cursor-pointer"
+                        onClick={handleCopyAccount}
+                        className="w-full py-1 px-2 rounded-lg bg-white dark:bg-slate-800 text-[11px] font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1 hover:border-emerald-500 transition-colors cursor-pointer"
                       >
-                        {copied ? <Check className="w-3 h-3 text-[--volt-charge]" /> : <Copy className="w-3 h-3" />}
-                        {copied ? 'Copied' : 'Copy number'}
+                        {copiedAccount ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                        <span>{copiedAccount ? 'Copied!' : 'Copy Account'}</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Quick actions — electricity gets amber, rest get charge-green */}
-                  <div className="grid grid-cols-4 gap-2">
-                    {[
-                      { label: 'Airtime', sub: '2% back', icon: Smartphone, color: 'text-[--volt-charge]', bg: 'bg-[--volt-charge]/10', service: 'airtime' as const },
-                      { label: 'Data', sub: 'SME rates', icon: Wifi, color: 'text-[--volt-charge]', bg: 'bg-[--volt-charge]/10', service: 'data' as const },
-                      { label: 'Electricity', sub: 'Instant token', icon: Zap, color: 'text-[--volt-amber]', bg: 'bg-[--volt-amber]/10', service: 'electricity' as const },
-                      { label: 'Cable TV', sub: 'DStv & GOtv', icon: Tv, color: 'text-[--volt-charge]', bg: 'bg-[--volt-charge]/10', service: 'cable' as const },
-                    ].map(({ label, sub, icon: Icon, color, bg, service }) => (
-                      <button
-                        key={label}
-                        onClick={() => onExploreService(service)}
-                        className="p-3 rounded-lg bg-[--volt-surface] dark:bg-[#0d1117]/60 border border-[--volt-line] text-left hover:border-[--volt-charge]/40 transition-colors cursor-pointer"
-                      >
-                        <div className={`w-8 h-8 rounded-md ${bg} ${color} flex items-center justify-center mb-2`}>
-                          <Icon className="w-4 h-4" />
-                        </div>
-                        <p className="font-bold text-[12px] text-[--volt-text] leading-none">{label}</p>
-                        <p className={`text-[10px] font-semibold mt-0.5 ${color}`}>{sub}</p>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Sample transactions */}
-                  <div className="rounded-lg border border-[--volt-line] overflow-hidden">
-                    <div className="flex justify-between items-center px-4 py-2.5 border-b border-[--volt-line] bg-[--volt-surface] dark:bg-[#0d1117]/40">
-                      <span className="font-semibold text-[12px] text-[--volt-text]">Recent transactions</span>
-                      <span className="text-[11px] text-[--volt-muted]">Live</span>
-                    </div>
-                    <div className="divide-y divide-[--volt-line]">
-                      <div className="flex items-center justify-between px-4 py-3 text-[12px]">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-md bg-[--volt-charge]/10 flex items-center justify-center">
-                            <Smartphone className="w-3.5 h-3.5 text-[--volt-charge]" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-[--volt-text]">MTN Airtime · 08149823411</p>
-                            <p className="text-[11px] text-[--volt-muted]">Today, 11:02 AM</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-display font-bold text-[--volt-text]">₦2,000</p>
-                          <span className="text-[10px] font-bold text-[--volt-charge]">Successful</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between px-4 py-3 text-[12px]">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-md bg-[--volt-amber]/10 flex items-center justify-center">
-                            <Zap className="w-3.5 h-3.5 text-[--volt-amber]" />
-                          </div>
-                          <div>
-                            <p className="font-semibold text-[--volt-text]">EKEDC Prepaid Meter</p>
-                            <p className="text-[11px] text-[--volt-muted]">Token: 4892-0194-8261-9034</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-display font-bold text-[--volt-text]">₦15,100</p>
-                          <span className="text-[10px] font-bold text-[--volt-charge]">Successful</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Trust bar — plain text, no icon-card grid ────────────────────── */}
-      <section className="border-b border-[--volt-line] bg-[--volt-panel] dark:bg-[#111827]/60">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-[13px]">
-            {[
-              ['3–5 second fulfillment', 'on every top-up'],
-              ['256-bit TLS', 'bank-grade encryption'],
-              ['24/7 availability', 'weekends & holidays'],
-              ['PDF receipts', 'downloadable instantly'],
-              ['Zero ghosting', 'dispute desk with priority SLA'],
-            ].map(([title, sub]) => (
-              <div key={title} className="space-y-0.5">
-                <p className="font-bold text-[--volt-text] text-[13px] leading-snug">{title}</p>
-                <p className="text-[12px] text-[--volt-muted] leading-snug">{sub}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Services ─────────────────────────────────────────────────────── */}
-      <section id="services" className="py-20 sm:py-24 border-b border-[--volt-line]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="max-w-[55ch]">
-            <h2 className="font-display text-[2rem] sm:text-[2.25rem] font-bold leading-[1.15] text-[--volt-text]">
-              Four utilities. One wallet. No switching between apps.
-            </h2>
-            <p className="mt-3 text-[1rem] text-[--volt-subtext] leading-[1.7]">
-              Direct integrations into Nigerian Telcos, NERC Discos, and Multichoice satellite networks — no middlemen, no markup.
-            </p>
-          </div>
-
-          {/* Service cards — electricity gets amber, rest get charge-green. No identical hover-lift. */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              {
-                icon: Smartphone,
-                label: 'Airtime',
-                body: 'Recharge MTN, Airtel, Glo, and 9mobile with 2% cashback credited to your wallet on every recharge.',
-                cta: 'Recharge a number',
-                accentText: 'text-[--volt-charge]',
-                accentBg: 'bg-[--volt-charge]/10',
-                accentBorder: 'hover:border-[--volt-charge]/40',
-                service: 'airtime' as const,
-                badge: '2% cashback',
-              },
-              {
-                icon: Wifi,
-                label: 'Data bundles',
-                body: 'Daily, weekly, and monthly SME plans for phones, home routers, and business modems at wholesale rates.',
-                cta: 'Browse plans',
-                accentText: 'text-[--volt-charge]',
-                accentBg: 'bg-[--volt-charge]/10',
-                accentBorder: 'hover:border-[--volt-charge]/40',
-                service: 'data' as const,
-                badge: 'Wholesale rates',
-              },
-              {
-                icon: Zap,
-                label: 'Electricity',
-                body: 'Prepaid and postpaid accounts across IKEDC, EKEDC, AEDC, IBEDC, PHED, EEDC, and KEDCO. Token on screen in seconds.',
-                cta: 'Pay your meter',
-                accentText: 'text-[--volt-amber]',
-                accentBg: 'bg-[--volt-amber]/10',
-                accentBorder: 'hover:border-[--volt-amber]/40',
-                service: 'electricity' as const,
-                badge: 'STS token instant',
-              },
-              {
-                icon: Tv,
-                label: 'Cable TV',
-                body: 'Decoder reactivation and bouquet upgrades for DStv, GOtv, and StarTimes. Ownership verified before payment.',
-                cta: 'Renew subscription',
-                accentText: 'text-[--volt-charge]',
-                accentBg: 'bg-[--volt-charge]/10',
-                accentBorder: 'hover:border-[--volt-charge]/40',
-                service: 'cable' as const,
-                badge: 'DStv, GOtv, StarTimes',
-              },
-            ].map(({ icon: Icon, label, body, cta, accentText, accentBg, accentBorder, service, badge }) => (
-              <div
-                key={label}
-                className={`bg-[--volt-panel] dark:bg-[#1a2234] border border-[--volt-line] rounded-lg p-6 flex flex-col justify-between ${accentBorder} transition-colors group`}
-              >
-                <div className="space-y-4">
-                  <div className={`w-10 h-10 rounded-md ${accentBg} ${accentText} flex items-center justify-center`}>
-                    <Icon className="w-5 h-5" />
-                  </div>
+                  {/* Interactive Service Simulator Switcher */}
                   <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-display text-[1.0625rem] font-bold text-[--volt-text]">{label}</h3>
-                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${accentBg} ${accentText}`}>{badge}</span>
+                    <div className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2.5 flex items-center justify-between">
+                      <span>Interactive Live Simulator</span>
+                      <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold">Try clicking amounts</span>
                     </div>
-                    <p className="text-[0.875rem] text-[--volt-subtext] leading-[1.65]">{body}</p>
+
+                    <div className="grid grid-cols-4 gap-2">
+                      <button
+                        onClick={() => setDemoService('airtime')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                          demoService === 'airtime'
+                            ? 'bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold shadow-sm'
+                            : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                        }`}
+                      >
+                        <Smartphone className="w-4 h-4 mx-auto mb-1 text-emerald-500" />
+                        <span className="text-xs block">Airtime</span>
+                      </button>
+
+                      <button
+                        onClick={() => setDemoService('data')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                          demoService === 'data'
+                            ? 'bg-blue-500/15 border-blue-500 text-blue-700 dark:text-blue-300 font-bold shadow-sm'
+                            : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                        }`}
+                      >
+                        <Wifi className="w-4 h-4 mx-auto mb-1 text-blue-500" />
+                        <span className="text-xs block">Data</span>
+                      </button>
+
+                      <button
+                        onClick={() => setDemoService('electricity')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                          demoService === 'electricity'
+                            ? 'bg-amber-500/15 border-amber-500 text-amber-700 dark:text-amber-300 font-bold shadow-sm'
+                            : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                        }`}
+                      >
+                        <Zap className="w-4 h-4 mx-auto mb-1 text-amber-500" />
+                        <span className="text-xs block">Power</span>
+                      </button>
+
+                      <button
+                        onClick={() => setDemoService('cable')}
+                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                          demoService === 'cable'
+                            ? 'bg-purple-500/15 border-purple-500 text-purple-700 dark:text-purple-300 font-bold shadow-sm'
+                            : 'bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-white/5 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                        }`}
+                      >
+                        <Tv className="w-4 h-4 mx-auto mb-1 text-purple-500" />
+                        <span className="text-xs block">Cable TV</span>
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Dynamic Simulator Details */}
+                  {demoService === 'airtime' && (
+                    <div className="rounded-2xl bg-slate-50 dark:bg-slate-900/60 p-4 border border-slate-200/80 dark:border-white/5 space-y-3">
+                      {/* Network selection */}
+                      <div className="flex items-center justify-between gap-2">
+                        {['MTN', 'AIRTEL', 'GLO', '9MOBILE'].map((net) => (
+                          <button
+                            key={net}
+                            onClick={() => setDemoNetwork(net)}
+                            className={`flex-1 py-1.5 px-2 rounded-lg text-[11px] font-bold border transition-all cursor-pointer ${
+                              demoNetwork === net
+                                ? 'bg-emerald-500 text-slate-950 border-emerald-400 shadow-sm'
+                                : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            {net}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Quick Amounts */}
+                      <div className="flex items-center gap-2">
+                        {[1000, 2000, 5000, 10000].map((amt) => (
+                          <button
+                            key={amt}
+                            onClick={() => setDemoAmount(amt)}
+                            className={`flex-1 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                              demoAmount === amt
+                                ? 'bg-emerald-500/15 border-emerald-500 text-emerald-700 dark:text-emerald-300 font-bold'
+                                : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400'
+                            }`}
+                          >
+                            {formatNaira(amt, false)}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Cashback math display */}
+                      <div className="pt-2 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+                        <div>
+                          <span className="text-slate-500 dark:text-slate-400">Recharge Value: </span>
+                          <span className="font-mono font-bold text-slate-900 dark:text-white">{formatNaira(demoAmount)}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold">You Pay Only: </span>
+                          <span className="font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">{formatNaira(demoTotalToPay)}</span>
+                          <span className="block text-[10px] text-emerald-500 font-bold">(Saved {formatNaira(demoCashback)} instant)</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {demoService === 'electricity' && (
+                    <div className="rounded-2xl bg-amber-500/5 border border-amber-500/20 p-4 space-y-2.5">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="font-bold text-amber-700 dark:text-amber-300">EKEDC Prepaid STS Token Generator</span>
+                        <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">Verified</span>
+                      </div>
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 border border-amber-500/30 flex items-center justify-between">
+                        <span className="font-mono text-sm font-bold tracking-widest text-slate-900 dark:text-white">
+                          4892-0194-8261-9034
+                        </span>
+                        <button
+                          onClick={handleCopyToken}
+                          className="px-2 py-1 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[11px] font-bold flex items-center gap-1 hover:bg-amber-500/30 transition-colors"
+                        >
+                          {copiedToken ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
+                          <span>{copiedToken ? 'Copied' : 'Copy'}</span>
+                        </button>
+                      </div>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">Tokens generate and dispatch via SMS within 3 seconds of PIN authorization.</p>
+                    </div>
+                  )}
+
+                  {(demoService === 'data' || demoService === 'cable') && (
+                    <div className="rounded-2xl bg-blue-500/5 border border-blue-500/20 p-4 space-y-2 text-xs">
+                      <div className="flex justify-between font-bold text-slate-900 dark:text-white">
+                        <span>{demoService === 'data' ? 'SME 5G High-Speed Bundle' : 'DStv Compact Plus Bouquet'}</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-mono">{demoService === 'data' ? '₦300/GB' : '₦19,800/mo'}</span>
+                      </div>
+                      <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-[11px]">
+                        {demoService === 'data'
+                          ? 'Wholesale direct SME telco tariffs delivered instantly to mobile devices and routers.'
+                          : 'Smartcard owner name verified on-screen before payment with instant satellite reactivation.'}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Primary Exploration Action */}
+                  <button
+                    onClick={() => onExploreService(demoService)}
+                    className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-950 text-xs font-bold flex items-center justify-center gap-2 hover:bg-emerald-600 dark:hover:bg-emerald-400 transition-colors cursor-pointer shadow-md"
+                  >
+                    <span>Launch {demoService.toUpperCase()} Recharge Module</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => onExploreService(service)}
-                  className={`mt-6 text-[13px] font-bold ${accentText} hover:underline underline-offset-2 text-left cursor-pointer`}
-                >
-                  {cta}
-                </button>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── How it works — numbered list, NOT identical cards ─────────────── */}
-      <section id="how-it-works" className="py-20 sm:py-24 bg-[--volt-panel] dark:bg-[#111827]/50 border-b border-[--volt-line]">
+      {/* ── TRUST METRICS STRIP ─────────────────────────────────────────── */}
+      <section className="py-12 bg-white/60 dark:bg-slate-900/40 backdrop-blur-md border-y border-slate-200/80 dark:border-white/5 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-[50ch] mb-12">
-            <h2 className="font-display text-[2rem] sm:text-[2.25rem] font-bold leading-[1.15] text-[--volt-text]">
-              Three steps from wallet to paid
-            </h2>
-          </div>
-
-          {/* Steps as a numbered list — content IS sequential, numbers earn their place */}
-          <div className="space-y-0 divide-y divide-[--volt-line] max-w-3xl">
-            {[
-              {
-                n: '01',
-                title: 'Fund your wallet',
-                body: 'Transfer to your dedicated Wema Bank virtual account from any Nigerian mobile banking app. Balance reflects in seconds — no refresh needed.',
-              },
-              {
-                n: '02',
-                title: 'Pick a service and enter the details',
-                body: 'Choose Airtime, Data, Electricity, or Cable TV. Select from your saved beneficiaries or type in a phone number, meter number, or smartcard ID.',
-              },
-              {
-                n: '03',
-                title: 'Authorize with your PIN — done',
-                body: 'Enter your 4-digit Transaction PIN. Your service is fulfilled in 3 seconds and a verifiable electronic receipt is available to download immediately.',
-              },
-            ].map(({ n, title, body }) => (
-              <div key={n} className="flex gap-6 sm:gap-10 py-9 first:pt-0 last:pb-0">
-                <span className="font-display font-black text-[2rem] sm:text-[2.75rem] leading-none text-[--volt-line] dark:text-[#1e2d3d] shrink-0 select-none w-[3rem] sm:w-[4rem] text-right">
-                  {n}
-                </span>
-                <div className="space-y-2 pt-1">
-                  <h3 className="font-display text-[1.125rem] font-bold text-[--volt-text] leading-snug">{title}</h3>
-                  <p className="text-[0.9375rem] text-[--volt-subtext] leading-[1.65] max-w-[52ch]">{body}</p>
-                </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            
+            <div className="space-y-1">
+              <div className="font-display text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
+                3–5<span className="text-emerald-500">s</span>
               </div>
-            ))}
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Instant Dispensation</p>
+              <p className="text-[11px] text-slate-500">Airtime, data & tokens delivered live</p>
+            </div>
+
+            <div className="space-y-1">
+              <div className="font-display text-3xl sm:text-4xl font-black text-emerald-600 dark:text-emerald-400">
+                2.0%
+              </div>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Permanent Cashback</p>
+              <p className="text-[11px] text-slate-500">On every single Telco recharge</p>
+            </div>
+
+            <div className="space-y-1">
+              <div className="font-display text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
+                99.99<span className="text-emerald-500">%</span>
+              </div>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Automated Uptime</p>
+              <p className="text-[11px] text-slate-500">24/7 weekend and holiday uptime</p>
+            </div>
+
+            <div className="space-y-1">
+              <div className="font-display text-3xl sm:text-4xl font-black text-slate-900 dark:text-white">
+                ₦0.00
+              </div>
+              <p className="text-xs font-bold text-slate-700 dark:text-slate-300">Zero Inward Fees</p>
+              <p className="text-[11px] text-slate-500">Free dedicated virtual bank account</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Pricing — ruled table, not identical cards ─────────────────────── */}
-      <section id="pricing" className="py-20 sm:py-24 border-b border-[--volt-line]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
-          <div className="max-w-[50ch]">
-            <h2 className="font-display text-[2rem] sm:text-[2.25rem] font-bold leading-[1.15] text-[--volt-text]">
-              Honest fees
+      {/* ── CORE SERVICES ECOSYSTEM ─────────────────────────────────────── */}
+      <section id="services" className="py-20 sm:py-28 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
+          
+          <div className="max-w-2xl space-y-3">
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              Complete Utility Suite
+            </span>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
+              Four vital everyday utilities. One unified wallet.
             </h2>
-            <p className="mt-3 text-[1rem] text-[--volt-subtext] leading-[1.7]">
-              No monthly subscription. No hidden markups. Two services are entirely free.
+            <p className="text-base text-slate-600 dark:text-slate-400 leading-relaxed">
+              No switching between different bank apps or waiting for slow USSD codes. Connect directly with major Nigerian Telcos, electricity Discos, and Multichoice decoders.
             </p>
           </div>
 
-          <div className="max-w-3xl border border-[--volt-line] rounded-lg overflow-hidden">
-            <table className="w-full text-[0.875rem]">
-              <thead>
-                <tr className="bg-[--volt-surface] dark:bg-[#0d1117]/60 border-b border-[--volt-line]">
-                  <th className="text-left px-5 py-3 font-semibold text-[--volt-muted] text-[12px] uppercase tracking-wide">Service</th>
-                  <th className="text-left px-5 py-3 font-semibold text-[--volt-muted] text-[12px] uppercase tracking-wide">Fee</th>
-                  <th className="text-left px-5 py-3 font-semibold text-[--volt-muted] text-[12px] uppercase tracking-wide hidden sm:table-cell">Detail</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[--volt-line] bg-[--volt-panel] dark:bg-[#1a2234]">
-                <tr className="hover:bg-[--volt-surface] dark:hover:bg-[#111827]/60 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2.5">
-                      <Smartphone className="w-4 h-4 text-[--volt-charge] shrink-0" />
-                      <span className="font-semibold text-[--volt-text]">Airtime top-up</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="font-display font-bold text-[--volt-charge]">Free + 2% back</span>
-                  </td>
-                  <td className="px-5 py-4 text-[--volt-muted] hidden sm:table-cell">You pay ₦980 for ₦1,000 airtime</td>
-                </tr>
-                <tr className="hover:bg-[--volt-surface] dark:hover:bg-[#111827]/60 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2.5">
-                      <Wifi className="w-4 h-4 text-[--volt-charge] shrink-0" />
-                      <span className="font-semibold text-[--volt-text]">Data bundles</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="font-display font-bold text-[--volt-text]">Free</span>
-                  </td>
-                  <td className="px-5 py-4 text-[--volt-muted] hidden sm:table-cell">Wholesale SME rates from ₦300/GB, zero markup</td>
-                </tr>
-                <tr className="hover:bg-[--volt-surface] dark:hover:bg-[#111827]/60 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2.5">
-                      <Zap className="w-4 h-4 text-[--volt-amber] shrink-0" />
-                      <span className="font-semibold text-[--volt-text]">Electricity</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="font-display font-bold text-[--volt-text]">₦100</span>
-                  </td>
-                  <td className="px-5 py-4 text-[--volt-muted] hidden sm:table-cell">NERC-regulated utility gateway charge</td>
-                </tr>
-                <tr className="hover:bg-[--volt-surface] dark:hover:bg-[#111827]/60 transition-colors">
-                  <td className="px-5 py-4">
-                    <div className="flex items-center gap-2.5">
-                      <Tv className="w-4 h-4 text-[--volt-charge] shrink-0" />
-                      <span className="font-semibold text-[--volt-text]">Cable TV</span>
-                    </div>
-                  </td>
-                  <td className="px-5 py-4">
-                    <span className="font-display font-bold text-[--volt-text]">₦50</span>
-                  </td>
-                  <td className="px-5 py-4 text-[--volt-muted] hidden sm:table-cell">Standard DStv, GOtv, StarTimes processing fee</td>
-                </tr>
-              </tbody>
-            </table>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            {/* Airtime Card */}
+            <div 
+              onClick={() => onExploreService('airtime')}
+              className="group relative rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 hover:border-emerald-500/40 shadow-lg hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+            >
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Smartphone className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">Instant Top-Up</span>
+                  <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white mt-1">Airtime Recharge</h3>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Recharge MTN, Airtel, Glo, and 9mobile in seconds with an automatic 2% cashback discount credited straight back to your wallet.
+                </p>
+                
+                {/* Telco Pill Ribbon */}
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-yellow-400/20 text-yellow-700 dark:text-yellow-300">MTN</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-red-500/20 text-red-700 dark:text-red-300">Airtel</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300">Glo</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-lime-500/20 text-lime-700 dark:text-lime-300">9mobile</span>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400 group-hover:text-emerald-500">
+                <span>Buy Airtime</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+
+            {/* Data Card */}
+            <div 
+              onClick={() => onExploreService('data')}
+              className="group relative rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 hover:border-blue-500/40 shadow-lg hover:shadow-xl hover:shadow-blue-500/10 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+            >
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Wifi className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">High-Speed 5G</span>
+                  <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white mt-1">Broadband Data</h3>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Affordable daily, weekly, monthly, and SME wholesale data plans for mobile phones, modems, routers, and corporate modems.
+                </p>
+
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-700 dark:text-blue-300">SME Wholesale</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">From ₦300/GB</span>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-blue-600 dark:text-blue-400 group-hover:text-blue-500">
+                <span>Browse Data Plans</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+
+            {/* Electricity Card */}
+            <div 
+              onClick={() => onExploreService('electricity')}
+              className="group relative rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 hover:border-amber-500/40 shadow-lg hover:shadow-xl hover:shadow-amber-500/10 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+            >
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Zap className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">NERC Verified Discos</span>
+                  <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white mt-1">Electricity Bills</h3>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Instant prepaid STS meter token generation and postpaid bill settlement across IKEDC, EKEDC, AEDC, IBEDC, PHED, EEDC, and KEDCO.
+                </p>
+
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300">20-Digit STS</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">All 11 Discos</span>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-amber-600 dark:text-amber-400 group-hover:text-amber-500">
+                <span>Pay Disco Meter</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
+
+            {/* Cable TV Card */}
+            <div 
+              onClick={() => onExploreService('cable')}
+              className="group relative rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 hover:border-purple-500/40 shadow-lg hover:shadow-xl hover:shadow-purple-500/10 transition-all duration-300 flex flex-col justify-between cursor-pointer"
+            >
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Tv className="w-6 h-6" />
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Instant Reactivation</span>
+                  <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white mt-1">Cable TV Renewal</h3>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                  Renew or upgrade DStv, GOtv, and StarTimes packages. Smartcard owner name is verified in real-time before debiting your wallet.
+                </p>
+
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/20 text-purple-700 dark:text-purple-300">DStv · GOtv</span>
+                  <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">StarTimes</span>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-xs font-bold text-purple-600 dark:text-purple-400 group-hover:text-purple-500">
+                <span>Renew Decoder</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ─────────────────────────────────────────────────────────── */}
-      <section id="faq" className="py-20 sm:py-24 border-b border-[--volt-line] bg-[--volt-panel] dark:bg-[#111827]/50">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <h2 className="font-display text-[2rem] font-bold text-[--volt-text] leading-[1.15]">
-            Common questions
-          </h2>
+      {/* ── HOW IT WORKS (Connected 3-Step Flow) ────────────────────────── */}
+      <section id="how-it-works" className="py-20 sm:py-28 bg-white dark:bg-[#0b101c] border-y border-slate-200/80 dark:border-white/5 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+          
+          <div className="text-center max-w-xl mx-auto space-y-3">
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              Frictionless Process
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
+              Three steps to settled bills
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Designed for speed, clarity, and zero ambiguity from deposit to verified receipt.
+            </p>
+          </div>
 
-          <div className="divide-y divide-[--volt-line]">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            
+            {/* Step 1 */}
+            <div className="rounded-3xl bg-slate-50 dark:bg-[#0f172a] p-8 border border-slate-200/80 dark:border-white/5 space-y-5 shadow-sm relative">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500 text-slate-950 font-display font-black text-xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                01
+              </div>
+              <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white">Fund your wallet</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Deposit via your dedicated Wema Bank virtual account from any mobile banking app, or check out with debit card via Paystack. Funds reflect automatically in under 5 seconds.
+              </p>
+              <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Zero bank inward deduction</span>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="rounded-3xl bg-slate-50 dark:bg-[#0f172a] p-8 border border-slate-200/80 dark:border-white/5 space-y-5 shadow-sm relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-400 text-slate-950 font-display font-black text-xl flex items-center justify-center shadow-lg shadow-teal-500/30">
+                02
+              </div>
+              <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white">Choose utility & enter details</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Select Airtime, Data, Electricity, or Cable TV. Pick from your saved frequent beneficiaries or enter a new phone number, meter number, or smartcard IUC.
+              </p>
+              <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-teal-600 dark:text-teal-400">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Automated meter & account validation</span>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="rounded-3xl bg-slate-50 dark:bg-[#0f172a] p-8 border border-slate-200/80 dark:border-white/5 space-y-5 shadow-sm relative">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-teal-500 to-cyan-400 text-slate-950 font-display font-black text-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                03
+              </div>
+              <h3 className="text-xl font-bold font-display text-slate-900 dark:text-white">Authorize with PIN & receive receipt</h3>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Input your secure 4-digit PIN. Your transaction dispenses in 3 seconds alongside a verifiable digital PDF receipt and instant SMS delivery.
+              </p>
+              <div className="pt-2 flex items-center gap-2 text-xs font-semibold text-cyan-600 dark:text-cyan-400">
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Instant downloadable PDF receipt</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── PRICING & FEES TRANSPARENCY ─────────────────────────────────── */}
+      <section id="pricing" className="py-20 sm:py-28 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
+          
+          <div className="text-center max-w-xl mx-auto space-y-3">
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              Clear & Honest Pricing
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
+              Honest fees, zero hidden deductions
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              We publish our complete fee schedule openly. No maintenance charges, no monthly platform fees.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <div className="rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 space-y-4 shadow-sm hover:border-emerald-500/40 transition-all">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Airtime Top-Up</span>
+              <div className="font-display text-2xl font-extrabold text-emerald-600 dark:text-emerald-400">
+                FREE + 2% Cashback
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Pay ₦980 for ₦1,000 airtime across MTN, Airtel, Glo, and 9mobile. Cashback settles instantly.
+              </p>
+              <div className="pt-2 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5" /> ₦0 Platform Surcharge
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 space-y-4 shadow-sm hover:border-blue-500/40 transition-all">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">5G Broadband Data</span>
+              <div className="font-display text-2xl font-extrabold text-slate-900 dark:text-white">
+                Wholesale Tariffs
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Direct wholesale SME telco prices from ₦300/GB with zero markup over network carrier rates.
+              </p>
+              <div className="pt-2 text-[11px] font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5" /> Instant Volume Activation
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 space-y-4 shadow-sm hover:border-amber-500/40 transition-all">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Prepaid Electricity</span>
+              <div className="font-display text-2xl font-extrabold text-slate-900 dark:text-white">
+                ₦100 Utility Fee
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Statutory NERC utility gateway fee. Instant 20-digit STS meter token on-screen and via free SMS.
+              </p>
+              <div className="pt-2 text-[11px] font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5" /> All Discos (Prepaid/Postpaid)
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-white dark:bg-[#0f172a] p-7 border border-slate-200/80 dark:border-white/5 space-y-4 shadow-sm hover:border-purple-500/40 transition-all">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Cable TV Renewal</span>
+              <div className="font-display text-2xl font-extrabold text-slate-900 dark:text-white">
+                ₦50 Processing
+              </div>
+              <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                Standard Multichoice processing charge. Verified account holder matching before confirmation.
+              </p>
+              <div className="pt-2 text-[11px] font-bold text-purple-600 dark:text-purple-400 flex items-center gap-1.5">
+                <Check className="w-3.5 h-3.5" /> DStv, GOtv, StarTimes
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── FREQUENTLY ASKED QUESTIONS ─────────────────────────────────── */}
+      <section id="faq" className="py-20 sm:py-28 bg-white/70 dark:bg-[#0b101c]/70 backdrop-blur-md border-y border-slate-200/80 dark:border-white/5 transition-colors">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          
+          <div className="text-center space-y-3">
+            <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              Clear Answers
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-extrabold font-display text-slate-900 dark:text-white tracking-tight">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Everything you need to know before settling your daily bills with Voltiva.</p>
+          </div>
+
+          <div className="space-y-3.5">
             {faqs.map((f, i) => (
-              <div key={i}>
+              <div
+                key={i}
+                className="rounded-2xl bg-white dark:bg-[#0f172a] border border-slate-200/80 dark:border-white/5 overflow-hidden shadow-sm transition-all"
+              >
                 <button
                   onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                  className="w-full py-5 text-left font-semibold text-[0.9375rem] text-[--volt-text] flex items-center justify-between gap-4 cursor-pointer hover:text-[--volt-charge] transition-colors"
+                  className="w-full p-5 text-left font-bold text-sm text-slate-900 dark:text-white flex items-center justify-between gap-4 cursor-pointer hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
                 >
                   <span>{f.q}</span>
-                  {openFaq === i
-                    ? <ChevronUp className="w-4 h-4 text-[--volt-charge] shrink-0" />
-                    : <ChevronDown className="w-4 h-4 text-[--volt-muted] shrink-0" />
-                  }
+                  {openFaq === i ? (
+                    <ChevronUp className="w-4 h-4 text-emerald-500 shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
+                  )}
                 </button>
+                
                 <AnimatePresence>
                   {openFaq === i && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2, ease: 'easeInOut' }}
-                      className="overflow-hidden"
+                      transition={{ duration: 0.2 }}
+                      className="px-5 pb-5 text-xs text-slate-600 dark:text-slate-400 leading-relaxed border-t border-slate-100 dark:border-white/5 pt-3 overflow-hidden"
                     >
-                      <p className="pb-5 text-[0.9375rem] text-[--volt-subtext] leading-[1.7] max-w-[60ch]">
-                        {f.a}
-                      </p>
+                      {f.a}
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -557,72 +785,89 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onOpenAuth, onExploreS
         </div>
       </section>
 
-      {/* ── CTA — bold thing: the one full-bleed dark band ───────────────── */}
-      <section className="bg-[#0d1117] py-20 sm:py-28">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <h2 className="font-display font-black text-[2.25rem] sm:text-[3rem] text-white leading-[1.1] tracking-tight">
-            Open your Voltiva account <span className="text-[--volt-charge]">in under 60 seconds.</span>
-          </h2>
-          <p className="text-[1rem] text-slate-400 max-w-[45ch] mx-auto leading-[1.7]">
-            Free signup. No maintenance fees. Your first airtime recharge pays you back.
-          </p>
-          <button
-            onClick={() => onOpenAuth('signup')}
-            className="mt-2 px-8 py-4 rounded-md bg-[--volt-charge] text-[#0d1117] font-bold text-[1rem] cursor-pointer hover:opacity-90 transition-opacity inline-block"
-          >
-            Create your account
-          </button>
+      {/* ── BOLD FINAL CALL TO ACTION ───────────────────────────────────── */}
+      <section className="py-20 sm:py-28 relative z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="relative rounded-3xl bg-gradient-to-br from-slate-950 via-[#091522] to-emerald-950 p-8 sm:p-14 text-center space-y-6 shadow-2xl border border-emerald-500/30 overflow-hidden">
+            
+            {/* Ambient Lighting Orbs */}
+            <div className="absolute top-0 left-1/4 w-72 h-72 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-teal-500/20 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="relative space-y-4 max-w-2xl mx-auto">
+              <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold tracking-wider uppercase inline-block">
+                Ready in under 60 seconds
+              </span>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black font-display text-white tracking-tight leading-tight">
+                Stop overpaying for your daily Nigerian utilities.
+              </h2>
+              <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+                Join thousands of verified Nigerians enjoying automated wallet funding, permanent 2% airtime cashback, and zero failed transactions.
+              </p>
+            </div>
+
+            <div className="relative pt-2">
+              <button
+                onClick={() => onOpenAuth('signup')}
+                className="px-8 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-sm inline-flex items-center gap-2.5 shadow-xl shadow-emerald-500/30 hover:scale-[1.03] transition-all cursor-pointer"
+              >
+                <span>Create Your Free Account Now</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────────── */}
-      <footer className="bg-[--volt-panel] dark:bg-[#0d1117] border-t border-[--volt-line] py-12 text-[0.8125rem] text-[--volt-muted]">
+      {/* ── FOOTER ──────────────────────────────────────────────────────── */}
+      <footer className="bg-white dark:bg-[#070a12] border-t border-slate-200/80 dark:border-white/5 py-12 text-xs text-slate-500 dark:text-slate-400 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+          
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-md bg-[--volt-charge] flex items-center justify-center font-display font-black text-[#0d1117] text-sm">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center font-display font-black text-slate-950 text-base shadow-md">
                 V
               </div>
-              <span className="font-display text-[1.125rem] font-bold text-[--volt-text]">Voltiva</span>
+              <span className="font-display text-xl font-black text-slate-900 dark:text-white">Voltiva</span>
             </div>
-            <p className="text-[0.8125rem] text-[--volt-muted] leading-relaxed">
-              Everyday Nigerian utility payments — airtime, data, electricity, cable TV — from one wallet.
+            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+              Everyday payments made effortless. Direct, high-speed VTU infrastructure for airtime, data, electricity, and cable TV in Nigeria.
             </p>
           </div>
 
           <div>
-            <h4 className="font-bold text-[--volt-text] mb-3">Services</h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-3">Utility Services</h4>
             <ul className="space-y-2">
-              <li><button onClick={() => onExploreService('airtime')} className="hover:text-[--volt-charge] transition-colors cursor-pointer">Buy Airtime</button></li>
-              <li><button onClick={() => onExploreService('data')} className="hover:text-[--volt-charge] transition-colors cursor-pointer">Buy Data</button></li>
-              <li><button onClick={() => onExploreService('electricity')} className="hover:text-[--volt-charge] transition-colors cursor-pointer">Pay Electricity</button></li>
-              <li><button onClick={() => onExploreService('cable')} className="hover:text-[--volt-charge] transition-colors cursor-pointer">Cable TV</button></li>
+              <li><button onClick={() => onExploreService('airtime')} className="hover:text-emerald-600 dark:hover:text-white transition-colors cursor-pointer">Buy Airtime (2% Cashback)</button></li>
+              <li><button onClick={() => onExploreService('data')} className="hover:text-emerald-600 dark:hover:text-white transition-colors cursor-pointer">Buy High-Speed Data</button></li>
+              <li><button onClick={() => onExploreService('electricity')} className="hover:text-emerald-600 dark:hover:text-white transition-colors cursor-pointer">Prepaid Electricity Tokens</button></li>
+              <li><button onClick={() => onExploreService('cable')} className="hover:text-emerald-600 dark:hover:text-white transition-colors cursor-pointer">Cable TV Renewal (DStv/GOtv)</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-[--volt-text] mb-3">Company</h4>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-3">Company & Info</h4>
             <ul className="space-y-2">
-              <li><a href="#how-it-works" className="hover:text-[--volt-charge] transition-colors">How it works</a></li>
-              <li><a href="#pricing" className="hover:text-[--volt-charge] transition-colors">Fees &amp; limits</a></li>
-              <li><span className="text-[--volt-line] dark:text-[#1e2d3d] cursor-not-allowed">Privacy policy</span></li>
-              <li><span className="text-[--volt-line] dark:text-[#1e2d3d] cursor-not-allowed">Terms of service</span></li>
+              <li><a href="#how-it-works" className="hover:text-emerald-600 dark:hover:text-white transition-colors">How It Works</a></li>
+              <li><a href="#pricing" className="hover:text-emerald-600 dark:hover:text-white transition-colors">Fees & Limitations</a></li>
+              <li><span className="text-slate-400 dark:text-slate-600 cursor-not-allowed">Privacy Policy</span></li>
+              <li><span className="text-slate-400 dark:text-slate-600 cursor-not-allowed">Terms of Service</span></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-bold text-[--volt-text] mb-3">Support</h4>
-            <p className="mb-1">help@voltiva.ng</p>
-            <p className="mb-4">Lekki Phase 1, Lagos</p>
-            <div className="flex items-center gap-1.5 text-[--volt-charge] text-[12px] font-semibold">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>TLS encrypted</span>
+            <h4 className="font-bold text-slate-900 dark:text-white mb-3">Security & Rails</h4>
+            <p className="mb-1">Operations: help@voltiva.ng</p>
+            <p className="mb-3">Lekki Phase 1, Lagos, Nigeria</p>
+            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold text-[11px]">
+              <ShieldCheck className="w-4 h-4" />
+              <span>256-bit TLS Encrypted & Protected</span>
             </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mt-8 border-t border-[--volt-line] text-[11px] text-[--volt-muted]">
-          © {new Date().getFullYear()} Voltiva Technologies Ltd. All rights reserved.
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 mt-8 border-t border-slate-200/80 dark:border-white/5 text-center text-slate-400 dark:text-slate-500 text-[11px]">
+          © {new Date().getFullYear()} Voltiva Technologies Ltd. All rights reserved. Built for Nigerian digital commerce.
         </div>
       </footer>
     </div>

@@ -22,6 +22,23 @@
     --volt-amber:   #f59e0b;      /* Electricity only — power, the Disco grid */
     --volt-text:    #0d1117;      /* Primary text */
     --volt-subtext: #475569;      /* Body copy, descriptions */
+    /* Theme colors */
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-elevated: #f1f5f9;
+    --border-subtle: rgba(226, 232, 240, 0.8);
+    --border-highlight: rgba(16, 185, 129, 0.3);
+    
+    --brand-emerald: #10b981;
+    --brand-emerald-dark: #059669;
+    --brand-teal: #14b8a6;
+    --brand-amber: #f59e0b;
+    --brand-blue: #0284c7;
+    --brand-purple: #8b5cf6;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
   }
 
   .dark {
@@ -35,11 +52,22 @@
     --volt-amber:   #f59e0b;
     --volt-text:    #f1f5f9;
     --volt-subtext: #94a3b8;
+    --bg-main: #070a12;
+    --bg-surface: #0e1524;
+    --bg-surface-elevated: #131c31;
+    --border-subtle: rgba(255, 255, 255, 0.07);
+    --border-highlight: rgba(16, 185, 129, 0.35);
+
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
   }
 
   html {
     color-scheme: dark;
     font-size: 15px;              /* Base = 15px. Tailwind rem units scale from this */
+    font-size: 16px;
+    scroll-behavior: smooth;
   }
 
   html.light {
@@ -48,19 +76,26 @@
 
   body {
     font-family: var(--font-sans);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
     overflow-x: hidden;
     background-color: var(--volt-surface);
     color: var(--volt-text);
     transition: background-color 0.2s ease, color 0.2s ease;
+    transition: background-color 0.25s ease, color 0.25s ease;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   /* Visible keyboard focus — accessible quality floor */
+  /* Accessible focus ring */
   :focus-visible {
     outline: 2px solid var(--volt-charge);
     outline-offset: 3px;
     border-radius: 4px;
+    outline: 2px solid var(--brand-emerald);
+    outline-offset: 2px;
+    border-radius: 6px;
   }
 
   /* Respect motion preferences — one rule, all animations off */
@@ -77,6 +112,7 @@
 
 /* ─── Utility classes ────────────────────────────────────────────────────── */
 
+/* ─── Typography & Utilities ──────────────────────────────────────────────── */
 .font-display {
   font-family: var(--font-display);
 }
@@ -85,24 +121,65 @@
 .text-charge   { color: var(--volt-charge); }
 .bg-charge     { background-color: var(--volt-charge); }
 .border-charge { border-color: var(--volt-charge); }
+/* Glow & Atmospheric Effects */
+.glow-emerald {
+  box-shadow: 0 0 45px -10px rgba(16, 185, 129, 0.28);
+}
 
 /* Scrollbar — minimal, not invisible */
+.glow-emerald-lg {
+  box-shadow: 0 10px 60px -15px rgba(16, 185, 129, 0.35);
+}
+
+.glow-amber {
+  box-shadow: 0 0 45px -10px rgba(245, 158, 11, 0.25);
+}
+
+.glow-card {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+}
+
+.dark .glow-card {
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.45);
+}
+
+/* Subtle gradient mesh backgrounds */
+.bg-mesh-dark {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.1) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(15, 23, 42, 0.6) 0px, transparent 50%);
+}
+
+.bg-mesh-light {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.06) 0px, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(241, 245, 249, 0.8) 0px, transparent 50%);
+}
+
+/* Sleek scrollbar */
 ::-webkit-scrollbar {
   width: 5px;
   height: 5px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--volt-line);
+  background: rgba(148, 163, 184, 0.25);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--volt-muted);
+  background: rgba(148, 163, 184, 0.4);
 }
 
 /* ─── Print styles for receipts ──────────────────────────────────────────── */
+/* Print styles for receipts */
 @media print {
   body {
     background-color: #ffffff !important;

@@ -1,22 +1,22 @@
 import React, { useState } from 'react';
-import {
-  LayoutDashboard,
-  Smartphone,
-  Wifi,
-  Zap,
-  Tv,
-  Wallet as WalletIcon,
-  History,
-  Users,
-  Bell,
-  HelpCircle,
-  Settings,
-  ShieldCheck,
-  LogOut,
-  Menu,
-  X,
+import { 
+  LayoutDashboard, 
+  Smartphone, 
+  Wifi, 
+  Zap, 
+  Tv, 
+  Wallet as WalletIcon, 
+  History, 
+  Users, 
+  Bell, 
+  HelpCircle, 
+  Settings, 
+  ShieldCheck, 
+  LogOut, 
+  Menu, 
   ArrowDownLeft,
-  User,
+  ChevronRight,
+  Sparkles,
   Lock,
   UserCheck,
   RefreshCw
@@ -45,16 +45,16 @@ import { AdminDashboard } from './components/admin/AdminDashboard';
 import { FundWalletModal } from './components/wallet/FundWalletModal';
 
 export function AppContent() {
-  const {
-    user,
-    wallet,
-    activeView,
-    setActiveView,
-    notifications,
+  const { 
+    user, 
+    wallet, 
+    activeView, 
+    setActiveView, 
+    notifications, 
     logout,
     isAdmin,
     loginAsDemoAdmin,
-    loginAsDemoCustomer
+    loginAsDemoCustomer 
   } = useApp();
 
   const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
@@ -74,23 +74,24 @@ export function AppContent() {
   };
 
   const navItems = [
-    { id: 'dashboard',      label: 'Dashboard',         icon: LayoutDashboard },
-    { id: 'airtime',        label: 'Buy Airtime',        icon: Smartphone, badge: '2% back' },
-    { id: 'data',           label: 'Buy Data',           icon: Wifi },
-    { id: 'electricity',    label: 'Electricity',        icon: Zap },
-    { id: 'cable',          label: 'Cable TV',           icon: Tv },
-    { id: 'wallet',         label: 'My Wallet',          icon: WalletIcon },
-    { id: 'transactions',   label: 'Transactions',       icon: History },
-    { id: 'beneficiaries',  label: 'Beneficiaries',      icon: Users },
-    { id: 'notifications',  label: 'Notifications',      icon: Bell, count: unreadNotificationsCount },
-    { id: 'support',        label: 'Support',            icon: HelpCircle },
-    { id: 'settings',       label: 'Security & Roles',   icon: Settings },
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'airtime', label: 'Buy Airtime', icon: Smartphone, badge: '2% back' },
+    { id: 'data', label: 'Buy Data', icon: Wifi },
+    { id: 'electricity', label: 'Electricity Bill', icon: Zap },
+    { id: 'cable', label: 'Cable TV', icon: Tv },
+    { id: 'wallet', label: 'My Wallet', icon: WalletIcon },
+    { id: 'transactions', label: 'Transactions', icon: History },
+    { id: 'beneficiaries', label: 'Beneficiaries', icon: Users },
+    { id: 'notifications', label: 'Notifications', icon: Bell, count: unreadNotificationsCount },
+    { id: 'support', label: 'Support & Help', icon: HelpCircle },
+    { id: 'settings', label: 'Security & Roles', icon: Settings },
   ];
 
   if (isAdmin) {
     navItems.push({ id: 'admin', label: 'Admin Ledger', icon: ShieldCheck, badge: 'Admin' });
   }
 
+  // If user explicitly navigated to landing view or has no active session
   if (activeView === 'landing' || (!user && activeView !== 'dashboard')) {
     return (
       <>
@@ -108,97 +109,148 @@ export function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-[--volt-surface] text-[--volt-text] flex flex-col md:flex-row transition-colors duration-200 overflow-x-hidden w-full max-w-full">
-
+    <div className="min-h-screen bg-slate-50 dark:bg-[#070a12] text-slate-900 dark:text-slate-100 flex flex-col md:flex-row transition-colors duration-200 overflow-x-hidden w-full max-w-full selection:bg-emerald-500/20 selection:text-emerald-500">
+      
       {/* ── Mobile Top Header ────────────────────────────────────────────── */}
-      <header className="md:hidden sticky top-0 z-30 bg-[--volt-panel]/95 dark:bg-[#0d1117]/95 backdrop-blur-md border-b border-[--volt-line] px-4 py-3 flex items-center justify-between">
+      <header className="md:hidden sticky top-0 z-30 bg-white/90 dark:bg-[#090d16]/90 backdrop-blur-md border-b border-slate-200/80 dark:border-white/5 px-4 py-3 flex items-center justify-between shadow-xs">
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setMobileNavOpen(true)}
             aria-label="Open navigation menu"
-            className="p-2 rounded-md text-[--volt-muted] hover:text-[--volt-text] hover:bg-[--volt-line] transition-colors"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <Menu className="w-5 h-5" />
           </button>
-          <button
+          <div 
             onClick={() => setActiveView('dashboard')}
             className="flex items-center gap-2 cursor-pointer"
           >
-            <div className="w-7 h-7 rounded-md bg-[--volt-charge] flex items-center justify-center font-display font-black text-[#0d1117] text-sm">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center font-black text-slate-950 font-display text-sm shadow-sm">
               V
             </div>
-            <span className="font-display text-base font-bold text-[--volt-text]">Voltiva</span>
-          </button>
+            <span className="font-display text-lg font-bold text-slate-900 dark:text-white">Voltiva</span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Active Role Indicator */}
+          {isAdmin ? (
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-500/30 flex items-center gap-1">
+              <ShieldCheck className="w-3 h-3" /> Admin
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">
+              Customer
+            </span>
+          )}
+
           <ThemeToggle />
 
           <button
             onClick={() => setActiveView('notifications')}
-            className="relative p-2 rounded-md text-[--volt-muted] hover:text-[--volt-text] hover:bg-[--volt-line] transition-colors"
-            aria-label="Notifications"
+            className="relative p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Notifications"
           >
-            <Bell className="w-4.5 h-4.5" />
+            <Bell className="w-5 h-5" />
             {unreadNotificationsCount > 0 && (
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[--volt-charge]"></span>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-slate-900" />
             )}
           </button>
 
           <button
             onClick={() => setFundModalOpen(true)}
-            className="px-3 py-1.5 rounded-md bg-[--volt-charge] text-[#0d1117] text-[12px] font-bold transition-opacity hover:opacity-90"
+            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-xs font-extrabold transition-all shadow-sm cursor-pointer"
           >
             Fund
           </button>
         </div>
       </header>
 
-      {/* ── Desktop Sidebar — navigation only, no duplicate widgets ─────── */}
-      <aside className="hidden md:flex md:w-60 lg:w-64 flex-col justify-between bg-[--volt-panel] dark:bg-[#0d1117] border-r border-[--volt-line] shrink-0 sticky top-0 h-screen p-4 overflow-y-auto transition-colors duration-200">
-        <div className="space-y-6">
-
-          {/* Brand */}
-          <div className="flex items-center justify-between px-1 pt-1">
-            <button
+      {/* ── Desktop Persistent Sidebar ──────────────────────────────────── */}
+      <aside className="hidden md:flex md:w-64 lg:w-72 flex-col justify-between bg-white dark:bg-[#0c1322] border-r border-slate-200/80 dark:border-white/5 shrink-0 sticky top-0 h-screen p-4 overflow-y-auto transition-colors duration-200 shadow-sm">
+        <div className="space-y-5">
+          
+          {/* Brand & Theme Toggle */}
+          <div className="flex items-center justify-between px-2 pt-1">
+            <div 
               onClick={() => setActiveView('dashboard')}
-              className="flex items-center gap-2.5 cursor-pointer group"
+              className="flex items-center gap-3 cursor-pointer group"
             >
-              <div className="w-8 h-8 rounded-md bg-[--volt-charge] flex items-center justify-center font-display font-black text-[#0d1117] text-base">
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 via-emerald-500 to-teal-400 flex items-center justify-center font-black text-slate-950 font-display text-xl shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                 V
               </div>
-              <span className="font-display text-[1.0625rem] font-bold text-[--volt-text]">Voltiva</span>
-            </button>
+              <div>
+                <span className="font-display text-xl font-extrabold tracking-tight text-slate-900 dark:text-white block">Voltiva</span>
+                <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 tracking-wider">Fast Nigerian VTU</span>
+              </div>
+            </div>
+
             <ThemeToggle />
           </div>
 
-          {/* Role indicator — compact, no card chrome */}
-          <div className="flex items-center justify-between px-1">
-            <div className="flex items-center gap-1.5 text-[12px]">
+          {/* Authorization & Role Status Banner */}
+          <div className="px-3.5 py-2.5 rounded-2xl bg-slate-100/90 dark:bg-slate-900/80 border border-slate-200/80 dark:border-white/5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
               {isAdmin ? (
                 <>
-                  <ShieldCheck className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="font-semibold text-purple-400">Administrator</span>
+                  <ShieldCheck className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                  <div>
+                    <span className="text-[11px] font-bold text-purple-700 dark:text-purple-300 block">Administrator</span>
+                    <span className="text-[9px] text-slate-500 dark:text-slate-400">Full Ledger Access</span>
+                  </div>
                 </>
               ) : (
                 <>
-                  <UserCheck className="w-3.5 h-3.5 text-[--volt-charge]" />
-                  <span className="font-semibold text-[--volt-charge]">Verified</span>
+                  <UserCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  <div>
+                    <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 block">Verified Customer</span>
+                    <span className="text-[9px] text-emerald-600 dark:text-emerald-400">Tier 2 KYC</span>
+                  </div>
                 </>
               )}
             </div>
+
             <button
-              onClick={() => { if (isAdmin) loginAsDemoCustomer(); else loginAsDemoAdmin(); }}
-              title={isAdmin ? 'Switch to Customer view' : 'Switch to Admin view'}
-              className="text-[11px] px-2 py-1 rounded-sm bg-[--volt-line] hover:bg-[--volt-muted]/30 text-[--volt-muted] hover:text-[--volt-text] font-medium transition-colors flex items-center gap-1 cursor-pointer"
+              onClick={() => {
+                if (isAdmin) {
+                  loginAsDemoCustomer();
+                } else {
+                  loginAsDemoAdmin();
+                }
+              }}
+              title={isAdmin ? "Switch to Customer test view" : "Switch to Admin test view"}
+              className="text-[10px] px-2 py-1 rounded-lg bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold transition-colors flex items-center gap-1 cursor-pointer shadow-2xs"
             >
               <RefreshCw className="w-2.5 h-2.5" />
-              {isAdmin ? 'Customer' : 'Admin'}
+              <span>{isAdmin ? "Customer" : "Admin"}</span>
             </button>
           </div>
 
-          {/* Navigation */}
-          <nav className="space-y-0.5 text-[13px] font-semibold">
+          {/* Quick Balance Preview in Sidebar */}
+          <div className="p-4 rounded-2xl bg-gradient-to-br from-slate-900 via-[#0e1726] to-emerald-950 text-white shadow-md space-y-2.5 relative overflow-hidden">
+            <div className="absolute right-0 top-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none" />
+            <div className="flex items-center justify-between text-[11px] text-slate-400">
+              <span className="font-medium">Wallet Balance</span>
+              <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                Active
+              </span>
+            </div>
+            <div className="font-display text-xl font-black text-white">
+              {formatNaira(wallet?.availableBalance || 0)}
+            </div>
+            <button
+              id="sidebar-fund-wallet-btn"
+              onClick={() => setFundModalOpen(true)}
+              className="w-full py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:scale-[1.01]"
+            >
+              <ArrowDownLeft className="w-3.5 h-3.5" />
+              <span>Fund Balance</span>
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="space-y-1 text-xs font-semibold">
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeView === item.id;
@@ -207,28 +259,26 @@ export function AppContent() {
                   key={item.id}
                   id={`nav-${item.id}`}
                   onClick={() => setActiveView(item.id as ActiveView)}
-                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md transition-colors cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl transition-all cursor-pointer ${
                     isActive
-                      ? 'bg-[--volt-charge] text-[#0d1117] font-bold'
-                      : 'text-[--volt-muted] hover:text-[--volt-text] hover:bg-[--volt-line]'
+                      ? 'bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-extrabold shadow-md shadow-emerald-500/20'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4 shrink-0" />
+                  <div className="flex items-center gap-3">
+                    <Icon className={`w-4 h-4 ${isActive ? 'text-slate-950' : 'text-slate-400 dark:text-slate-500'}`} />
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                      isActive
-                        ? 'bg-[#0d1117]/20 text-[#0d1117]'
-                        : 'bg-[--volt-charge]/15 text-[--volt-charge]'
+                      isActive ? 'bg-slate-950/20 text-slate-950' : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300'
                     }`}>
                       {item.badge}
                     </span>
                   )}
                   {item.count !== undefined && item.count > 0 && (
                     <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
-                      isActive ? 'bg-[#0d1117] text-white' : 'bg-[--volt-charge] text-[#0d1117]'
+                      isActive ? 'bg-slate-950 text-white' : 'bg-emerald-500 text-slate-950'
                     }`}>
                       {item.count}
                     </span>
@@ -239,32 +289,33 @@ export function AppContent() {
           </nav>
         </div>
 
-        {/* Sidebar Footer: user identity + logout only */}
-        <div className="pt-4 border-t border-[--volt-line] space-y-3">
-          {/* Fund wallet shortcut */}
+        {/* Sidebar Footer: User & Landing switch */}
+        <div className="pt-4 border-t border-slate-200/80 dark:border-white/5 space-y-2 text-xs">
           <button
-            id="sidebar-fund-wallet-btn"
-            onClick={() => setFundModalOpen(true)}
-            className="w-full py-2 px-3 rounded-md bg-[--volt-charge]/10 hover:bg-[--volt-charge] hover:text-[#0d1117] text-[--volt-charge] text-[12px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[--volt-charge]/20"
+            onClick={() => setActiveView('landing')}
+            className="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center justify-between text-xs transition-colors cursor-pointer"
           >
-            <ArrowDownLeft className="w-3.5 h-3.5" />
-            Fund Wallet
+            <span className="flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+              <span>Public Landing Page</span>
+            </span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
           </button>
 
-          <div className="flex items-center justify-between p-2 rounded-md border border-[--volt-line]">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <div className="w-7 h-7 rounded-md bg-[--volt-charge]/20 text-[--volt-charge] flex items-center justify-center font-bold text-[12px] shrink-0">
+          <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/5">
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
                 {user?.fullName.charAt(0) || 'U'}
               </div>
               <div className="overflow-hidden min-w-0">
-                <p className="font-semibold text-[--volt-text] truncate text-[12px] leading-tight">{user?.fullName}</p>
-                <p className="text-[11px] text-[--volt-muted] truncate leading-tight">{user?.email}</p>
+                <p className="font-semibold text-slate-900 dark:text-white truncate text-xs">{user?.fullName}</p>
+                <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
               </div>
             </div>
             <button
               onClick={logout}
               title="Log out"
-              className="p-1.5 rounded-md text-[--volt-muted] hover:text-rose-500 hover:bg-[--volt-line] transition-colors shrink-0 cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors shrink-0 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
             </button>
@@ -272,149 +323,61 @@ export function AppContent() {
         </div>
       </aside>
 
-      {/* ── Mobile Drawer Navigation ─────────────────────────────────────── */}
-      <AnimatePresence>
-        {mobileNavOpen && (
-          <div className="fixed inset-0 z-50 flex md:hidden">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              onClick={() => setMobileNavOpen(false)}
-              className="fixed inset-0 bg-[#0d1117]/80 backdrop-blur-xs"
-            />
-            <motion.div
-              initial={{ x: -260 }}
-              animate={{ x: 0 }}
-              exit={{ x: -260 }}
-              transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="relative w-64 bg-[--volt-panel] dark:bg-[#0d1117] border-r border-[--volt-line] p-4 flex flex-col justify-between z-10 overflow-y-auto"
-            >
-              <div className="space-y-5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-md bg-[--volt-charge] flex items-center justify-center font-display font-black text-[#0d1117] text-sm">
-                      V
-                    </div>
-                    <span className="font-display text-base font-bold text-[--volt-text]">Voltiva</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <ThemeToggle />
-                    <button
-                      onClick={() => setMobileNavOpen(false)}
-                      className="p-1 text-[--volt-muted] hover:text-[--volt-text] cursor-pointer"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                <nav className="space-y-0.5 text-[13px] font-semibold">
-                  {navItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = activeView === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => { setActiveView(item.id as ActiveView); setMobileNavOpen(false); }}
-                        className={`w-full flex items-center justify-between px-3 py-2.5 rounded-md transition-colors cursor-pointer ${
-                          isActive
-                            ? 'bg-[--volt-charge] text-[#0d1117] font-bold'
-                            : 'text-[--volt-muted] hover:text-[--volt-text] hover:bg-[--volt-line]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Icon className="w-4 h-4 shrink-0" />
-                          <span>{item.label}</span>
-                        </div>
-                        {item.badge && (
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[--volt-charge]/15 text-[--volt-charge]">
-                            {item.badge}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </nav>
-              </div>
-
-              <div className="pt-4 border-t border-[--volt-line]">
-                <div className="flex items-center justify-between p-2 rounded-md border border-[--volt-line]">
-                  <div className="flex items-center gap-2 overflow-hidden">
-                    <div className="w-7 h-7 rounded-md bg-[--volt-charge]/20 text-[--volt-charge] flex items-center justify-center font-bold text-[12px] shrink-0">
-                      {user?.fullName.charAt(0) || 'U'}
-                    </div>
-                    <p className="font-semibold text-[--volt-text] truncate text-[12px]">{user?.fullName}</p>
-                  </div>
-                  <button
-                    onClick={() => { logout(); setMobileNavOpen(false); }}
-                    title="Log out"
-                    className="p-1.5 rounded-md text-[--volt-muted] hover:text-rose-500 hover:bg-[--volt-line] transition-colors cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* ── Main Content ─────────────────────────────────────────────────── */}
+      {/* ── Main Content Area ────────────────────────────────────────────── */}
       <main className="flex-1 min-w-0 p-3 sm:p-5 md:p-6 lg:p-8 overflow-y-auto overflow-x-hidden">
         <div className="max-w-7xl mx-auto w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeView}
-              initial={{ opacity: 0, y: 8 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
               className="w-full"
             >
-              {activeView === 'dashboard'    && <DashboardOverview />}
-              {activeView === 'airtime'      && <AirtimePurchase />}
-              {activeView === 'data'         && <DataPurchase />}
-              {activeView === 'electricity'  && <ElectricityBill />}
-              {activeView === 'cable'        && <CableTvSubscription />}
-              {activeView === 'wallet'       && <WalletView />}
+              {activeView === 'dashboard' && <DashboardOverview />}
+              {activeView === 'airtime' && <AirtimePurchase />}
+              {activeView === 'data' && <DataPurchase />}
+              {activeView === 'electricity' && <ElectricityBill />}
+              {activeView === 'cable' && <CableTvSubscription />}
+              {activeView === 'wallet' && <WalletView />}
               {activeView === 'transactions' && <TransactionsView />}
               {activeView === 'beneficiaries' && <BeneficiariesView />}
               {activeView === 'notifications' && <NotificationsView />}
-              {activeView === 'support'      && <SupportView />}
-              {activeView === 'settings'     && <SettingsView />}
+              {activeView === 'support' && <SupportView />}
+              {activeView === 'settings' && <SettingsView />}
 
+              {/* Protected Admin Route */}
               {activeView === 'admin' && (
                 isAdmin ? (
                   <AdminDashboard />
                 ) : (
                   <div className="max-w-xl mx-auto py-16 px-6 text-center space-y-6">
-                    <div className="w-14 h-14 rounded-xl bg-purple-500/10 text-purple-500 mx-auto flex items-center justify-center border border-purple-500/20">
-                      <Lock className="w-7 h-7" />
+                    <div className="w-16 h-16 rounded-3xl bg-purple-500/10 text-purple-600 dark:text-purple-400 mx-auto flex items-center justify-center border border-purple-500/20 shadow-sm">
+                      <Lock className="w-8 h-8" />
                     </div>
                     <div className="space-y-2">
-                      <h2 className="font-display text-[1.5rem] font-bold text-[--volt-text]">
-                        Administrator access required
+                      <h2 className="text-2xl font-bold font-display text-slate-900 dark:text-white">
+                        Administrator Access Required
                       </h2>
-                      <p className="text-[0.875rem] text-[--volt-subtext] leading-relaxed max-w-[45ch] mx-auto">
-                        The ledger and gateway reconciliation console are restricted to authorized administrators. Your current session role is{' '}
-                        <span className="font-bold text-[--volt-charge]">{user?.role || 'user'}</span>.
+                      <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                        The System Ledger and Gateway Reconciliation console are restricted to authorized administrators. Your current session is authenticated with role: <span className="font-mono font-semibold text-emerald-600">{user?.role || 'user'}</span>.
                       </p>
                     </div>
+
                     <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                       <button
                         onClick={() => loginAsDemoAdmin()}
-                        className="w-full sm:w-auto px-5 py-2.5 rounded-md bg-purple-600 hover:bg-purple-500 text-white font-bold text-[13px] flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-colors"
                       >
                         <ShieldCheck className="w-4 h-4" />
-                        Authorize as Admin
+                        <span>Authorize as Admin (Census Okoi)</span>
                       </button>
                       <button
                         onClick={() => setActiveView('dashboard')}
-                        className="w-full sm:w-auto px-5 py-2.5 rounded-md bg-[--volt-line] hover:bg-[--volt-muted]/20 text-[--volt-text] font-semibold text-[13px] transition-colors cursor-pointer"
+                        className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold text-xs transition-colors cursor-pointer"
                       >
-                        Back to Dashboard
+                        Return to Dashboard
                       </button>
                     </div>
                   </div>
@@ -430,6 +393,7 @@ export function AppContent() {
         isOpen={fundModalOpen}
         onClose={() => setFundModalOpen(false)}
       />
+
       <AuthModal
         isOpen={authModalOpen}
         initialMode={authMode}
@@ -442,3 +406,4 @@ export function AppContent() {
 export default function App() {
   return <AppContent />;
 }
+
